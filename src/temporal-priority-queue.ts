@@ -46,10 +46,9 @@ export class TemporalPriorityQueue<T> implements iTemporalPriorityQueue<T> {
         //first part of condition will fail after root node is processed
         while (
             parentNodeIndex !== -1 &&
-            this.temporalCompare(
+            this.priorityCompare(
                 this.heap[nodeIndex],
-                this.heap[parentNodeIndex],
-                now
+                this.heap[parentNodeIndex]
             ) > 0
         ) {
             this.swapNodes(nodeIndex, parentNodeIndex);
@@ -66,6 +65,7 @@ export class TemporalPriorityQueue<T> implements iTemporalPriorityQueue<T> {
         if (this.heap.length === 0) {
             return void 0;
         } else if (this.heap.length === 1) {
+            this.orderNumber = 0;
             return this.heap.pop()!.entry;
         }
 
@@ -86,25 +86,22 @@ export class TemporalPriorityQueue<T> implements iTemporalPriorityQueue<T> {
             //find the max child, set that value to current node, and proceed
             if (
                 rightChildIndex < this.heap.length &&
-                this.temporalCompare(
+                this.priorityCompare(
                     this.heap[rightChildIndex],
-                    this.heap[leftChildIndex],
-                    now
+                    this.heap[leftChildIndex]
                 ) > 0 &&
-                this.temporalCompare(
+                this.priorityCompare(
                     this.heap[rightChildIndex],
-                    this.heap[nodeIndex],
-                    now
+                    this.heap[nodeIndex]
                 ) > 0
             ) {
                 this.swapNodes(nodeIndex, rightChildIndex);
                 nodeIndex = rightChildIndex;
             } else if (
                 leftChildIndex < this.heap.length &&
-                this.temporalCompare(
+                this.priorityCompare(
                     this.heap[leftChildIndex],
-                    this.heap[nodeIndex],
-                    now
+                    this.heap[nodeIndex]
                 ) > 0
             ) {
                 this.swapNodes(nodeIndex, leftChildIndex);
@@ -134,26 +131,13 @@ export class TemporalPriorityQueue<T> implements iTemporalPriorityQueue<T> {
     /**
      * Compare two items with respect to their priorities and their ranks
      */
-    private temporalCompare(
+    private priorityCompare(
         a: iTemporalHeapItem<T>,
-        b: iTemporalHeapItem<T>,
-        nowMs: number
+        b: iTemporalHeapItem<T>
     ): number {
-        const diff = this.calcTemporalRank(a, nowMs) - this.calcTemporalRank(b, nowMs);
-        return diff === 0 ? b.orderNumber - a.orderNumber : diff;
-    }
-
-    /**
-     * Increase the item's rank based on time elapsed since it was added
-     */
-    private calcTemporalRank(
-        item: iTemporalHeapItem<T>,
-        nowMs: number
-    ): number {
-        return (
-            item.priority + (nowMs - item.timestampJs) /
-            this.opts.timeRankIncreaseMs
-        );
+        const base = a.priority - b.priority + (b.timestampJs - a.timestampJs) / this.opts.timeRankIncreaseMs;
+        // tie breaker, use whichever was inserted first
+        return base === 0 ? b.orderNumber - a.orderNumber : base;
     }
 
     /**

@@ -18,7 +18,7 @@ describe("TemporalPriorityQueue", () => {
         const outItems: string[] = [];
         while (queue.size() > 0) {
             outItems.push(queue.dequeue()!);
-        } 
+        }
 
         expect(outItems).toEqual(items);
     });
@@ -54,4 +54,21 @@ describe("TemporalPriorityQueue", () => {
         expect(outItems).toEqual(items.map(item => item.item));
     });
 
+    it("should increase priority as time moves on", () => {
+
+        let now = 0;
+        const queue = new TemporalPriorityQueue<string>({
+            timeRankIncreaseMs: 1,
+            getCurrentTimestampJs: () => now
+        });
+
+        const items = ["abc", "def"];
+        queue.enqueue(items[0], 1);
+
+        now += 2;
+        queue.enqueue(items[1], 2);
+
+        // should be the first, even though second has higher
+        expect(queue.dequeue()).toBe(items[0]);
+    });
 });
