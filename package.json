@@ -1,0 +1,31 @@
+{
+    "name": "@byte-this/temporal-priority-queue",
+    "version": "1.0.0",
+    "description": "A proof of concept for a priority queue which factors in the time added.",
+    "main": "index.js",
+    "scripts": {
+        "format": "npx prettier --write .",
+        "test": "npx jest --no-cache",
+        "test-coverage": "npx jest --no-cache --coverage"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/ByteThisStore/temporal-priority-queue.git"
+    },
+    "author": "Byte This!",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/ByteThisStore/temporal-priority-queue/issues"
+    },
+    "homepage": "https://github.com/ByteThisStore/temporal-priority-queue#readme",
+    "devDependencies": {
+        "@types/jest": "^27.4.1",
+        "husky": "^7.0.4",
+        "ts-jest": "^27.1.3"
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "npm run format"
+        }
+    }
+}
